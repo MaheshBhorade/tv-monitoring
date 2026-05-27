@@ -24,3 +24,7 @@ tv_monitoring.db-journal
 .idea/
 Thumbs.db
 Desktop.ini
+
+# Environment Binaries & Local Configs
+cloudflared.exe
+device_config.json
