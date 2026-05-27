@@ -1,0 +1,8 @@
+{
+  "server_url": "http://192.168.1.52:8000",
+  "device_id": "PI_DELHI_01",
+  "device_location": "Delhi Retail Hub 1",
+  "capture_mode": "both",
+  "capture_interval": 5.0,
+  "video_duration": 60.0
+}

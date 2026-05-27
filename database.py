@@ -19,6 +19,8 @@ class Device(Base):
 
     device_id = Column(String, primary_key=True, index=True)
     ip_address = Column(String, nullable=True)
+    public_ip = Column(String, nullable=True)
+    location = Column(String, nullable=True)
     capture_mode = Column(String, nullable=True)  # "image" or "video"
     status = Column(String, default="offline")    # "online", "offline", "error"
     disk_free_gb = Column(Float, default=0.0)

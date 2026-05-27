@@ -19,9 +19,28 @@ except ImportError:
 # CLIENT CONFIGURATION (Can be expanded with dotenv)
 SERVER_URL = "http://192.168.1.52:8000"
 DEVICE_ID = "PI001"
+DEVICE_LOCATION = "Default Location"
 CAPTURE_MODE = "both"  # "image", "video", or "both"
 CAPTURE_INTERVAL = 5.0  # Captures a static frame every 5 seconds in 'both' mode
 VIDEO_CHUNK_DURATION = 60.0  # 1-minute chunks for video mode
+
+# Dynamically load config file if present (for different locations/networks)
+config_path = os.path.join(os.path.dirname(__file__), "device_config.json")
+if os.path.exists(config_path):
+    try:
+        import json
+        with open(config_path, "r") as f:
+            cfg = json.load(f)
+            SERVER_URL = cfg.get("server_url", SERVER_URL)
+            DEVICE_ID = cfg.get("device_id", DEVICE_ID)
+            DEVICE_LOCATION = cfg.get("device_location", DEVICE_LOCATION)
+            CAPTURE_MODE = cfg.get("capture_mode", CAPTURE_MODE)
+            CAPTURE_INTERVAL = float(cfg.get("capture_interval", CAPTURE_INTERVAL))
+            VIDEO_CHUNK_DURATION = float(cfg.get("video_duration", VIDEO_CHUNK_DURATION))
+            print(f"[Config] Loaded local settings successfully from device_config.json!")
+            print(f"[Config] SERVER_URL: {SERVER_URL} | DEVICE_ID: {DEVICE_ID} | LOCATION: {DEVICE_LOCATION}")
+    except Exception as e:
+        print(f"[Config] Error loading device_config.json: {e}")
 
 CACHE_DIR = "local_cache"
 PENDING_DIR = os.path.join(CACHE_DIR, "pending")
@@ -101,7 +120,8 @@ def heartbeat_worker():
                 "disk_free_gb": get_disk_free_gb(),
                 "cpu_usage": get_cpu_usage(),
                 "cpu_temp": get_cpu_temp(),
-                "ram_usage": get_ram_usage()
+                "ram_usage": get_ram_usage(),
+                "location": DEVICE_LOCATION
             }
             
             res = requests.post(f"{SERVER_URL}/api/device/heartbeat", json=payload, timeout=5)

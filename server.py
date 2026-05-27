@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -41,6 +41,7 @@ class HeartbeatPayload(BaseModel):
     cpu_usage: Optional[float] = 0.0
     cpu_temp: Optional[float] = 0.0
     ram_usage: Optional[float] = 0.0
+    location: Optional[str] = None
 
 class LogEntry(BaseModel):
     level: str  # INFO, WARNING, ERROR, CRITICAL
@@ -216,13 +217,15 @@ async def upload_video(
 # NEW DEVICE STATUS & HEARTBEAT ENDPOINTS
 
 @app.post("/api/device/heartbeat")
-async def device_heartbeat(payload: HeartbeatPayload, db: Session = Depends(get_db)):
+async def device_heartbeat(payload: HeartbeatPayload, request: Request, db: Session = Depends(get_db)):
     device = db.query(Device).filter(Device.device_id == payload.device_id).first()
     if not device:
         device = Device(device_id=payload.device_id)
         db.add(device)
     
     device.ip_address = payload.ip_address or device.ip_address
+    device.public_ip = request.client.host if request.client else "Unknown"
+    device.location = payload.location or device.location
     device.capture_mode = payload.capture_mode or device.capture_mode
     device.disk_free_gb = payload.disk_free_gb
     device.cpu_usage = payload.cpu_usage
@@ -275,6 +278,8 @@ async def get_devices(db: Session = Depends(get_db)):
         out.append({
             "device_id": dev.device_id,
             "ip_address": dev.ip_address or "Unknown",
+            "public_ip": dev.public_ip or "Unknown",
+            "location": dev.location or "Unknown Location",
             "capture_mode": dev.capture_mode or "Unknown",
             "status": status,
             "disk_free_gb": round(dev.disk_free_gb, 1),
@@ -1035,8 +1040,9 @@ async def get_dashboard():
                             <div class="device-card ${cardStatus}">
                                 <div class="device-card-header">
                                     <div class="device-meta">
-                                        <h4>${dev.device_id}</h4>
-                                        <p>IP: ${dev.ip_address}</p>
+                                        <h4>${dev.device_id} <span style="font-size: 11px; font-weight: normal; color: var(--text-secondary);">(${dev.location})</span></h4>
+                                        <p>Local IP: ${dev.ip_address}</p>
+                                        <p>Public IP: ${dev.public_ip}</p>
                                     </div>
                                     <span class="device-status-pill ${statusClass}">
                                         <span class="pulse-dot" style="animation: ${dev.status === 'online' ? 'pulse 1.8s infinite' : 'none'}; background-color: ${dev.status === 'online' ? 'var(--color-emerald)' : 'var(--color-rose)'}"></span>
