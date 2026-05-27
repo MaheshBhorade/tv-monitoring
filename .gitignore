@@ -1,0 +1,26 @@
+# ==================================================
+# TV Monitoring Enterprise GitIgnore
+# ==================================================
+
+# Dynamic storage and cache folders
+storage/
+local_cache/
+720_586/
+__pycache__/
+
+# Database files (local state)
+tv_monitoring.db
+tv_monitoring.db-journal
+
+# Temporary media and raw dumps
+*.mp4
+*.wav
+*.webp
+*.log
+.tempmediaStorage/
+
+# Operating System & Editor Files
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
