@@ -3,7 +3,7 @@ import os
 import json
 
 def upload():
-    host = "192.168.1.105"
+    host = "100.85.114.118"
     user = "indi"
     password = "iNdI#@R-71!0"
     
@@ -25,7 +25,7 @@ def upload():
         # 2. Generate local device_config.json on Windows first
         local_config = r"d:\AI ARC\device_config.json"
         config_data = {
-            "server_url": "https://male-classical-documents-individual.trycloudflare.com",
+            "server_url": "http://100.78.128.49:8000",
             "device_id": "PI_OFFICE_01",
             "device_location": "Office Testing Room",
             "capture_mode": "both",
