@@ -1,5 +1,5 @@
 {
-  "server_url": "http://192.168.1.52:8000",
+  "server_url": "http://100.64.98.76:8000",
   "device_id": "PI_DELHI_01",
   "device_location": "Delhi Retail Hub 1",
   "capture_mode": "both",
